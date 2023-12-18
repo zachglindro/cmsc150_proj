@@ -42,9 +42,9 @@ def minimize(df, max_iterations = 5000):
     df.columns = [f's{i}' for i in range(1, len(df.columns))] + ['rhs']
 
     # Add slack variables
-    for i in range(1, len(df.index)):
-        df.insert(len(df.columns)-1, f'x{i}', 0)
-    df.insert(len(df.columns)-1, 'z', 0)
+    column_names = [f'x{i}' for i in range(1, len(df.index))] + ['z']
+    for column_name in column_names:
+        df.insert(len(df.columns)-1, column_name, 0)
 
     # Make last row negative
     df.iloc[-1] = df.iloc[-1] * -1
