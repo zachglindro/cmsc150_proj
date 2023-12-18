@@ -1,6 +1,7 @@
 import pandas as pd
 import math as m
 
+# Gauss-Jordan Elimination, only to be used within this file and not run outside
 def gauss_jordan(df):
     for i in range(len(df.index)):
         # Divide row by pivot
@@ -13,6 +14,7 @@ def gauss_jordan(df):
 
     return df
 
+# Performs quadratic interpolation on the data and returns the final augcoeffmatrix (with solution at RHS)
 def quadratic_interpolator(data):
     # Generate colnames
     colnames = [f'b{i}' for i in range(1, len(data.index))] + [f'c{i}' for i in range(2, len(data.index))] + ['rhs']
@@ -50,30 +52,28 @@ def quadratic_interpolator(data):
 
     return matrix
     
-# Creates functions for each interval
-def create_functions(df):
-    print(df)
+# Generates the functions and their corresponding ranges based on the results from quadratic interpolator
+def get_functions_and_ranges(augcoeffmatrix, data):
     functions = []
     ranges = []
 
     # n-1 functions to be created
     for i in range(len(data.index) - 1):
         if i == 0:
-            raw_lambda = f'lambda x: {data.iloc[i, 1]} + {df.iloc[i, -1]}*(x - {data.iloc[i, 0]})'
+            raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]})'
         else:
-            raw_lambda = f'lambda x: {data.iloc[i, 1]} + {df.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {df.iloc[i+m.ceil(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
+            raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {augcoeffmatrix.iloc[i+m.ceil(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
         
         functions.append(eval(raw_lambda))
 
         raw_range_lambda = f'lambda x: {data.iloc[i,0]} <= x <= {data.iloc[i+1,0]}'
-        print(raw_range_lambda)
         ranges.append(eval(raw_range_lambda))
 
     return functions, ranges
 
-data = pd.read_csv('data.csv', sep='|')
-data = data.sort_values(by='x')
+# Imports a CSV file, sorts it by x, and returns the sorted data
+def import_data(file_name, sep):
+    data = pd.read_csv(file_name, sep=sep)
+    data = data.sort_values(by='x')
 
-solved = quadratic_interpolator(data)
-functions, ranges = create_functions(solved)
-print(ranges[0](3))
+    return data
