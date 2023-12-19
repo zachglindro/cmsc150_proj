@@ -39,9 +39,17 @@ def create_function(df):
     return function
 
 def regression(text, sep, order):
-    data = pd.read_csv(text, sep=sep, header=None)
+    x = []
+    y = []
+
+    for line in text.splitlines():
+        line = line.split(sep)
+        x.append(float(line[0]))
+        y.append(float(line[1]))
+    
+    data = pd.DataFrame({'x': x, 'y': y})
     augcoeffmatrix = generate_augcoeffmatrix(data, order)
     augcoeffmatrix = gauss_jordan(augcoeffmatrix)
 
-    f = eval(create_function(augcoeffmatrix))
+    f = create_function(augcoeffmatrix)
     return f
