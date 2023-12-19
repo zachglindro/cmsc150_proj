@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import quadratic.interpolator as qi
 
-
 # TODO: does not work w/ 3 points
 def interpolate(text, x):
     functions, ranges = qi.interpolateWithText(text)
@@ -43,7 +42,7 @@ st.set_page_config(page_title="Quadratic Spline Interpolation", page_icon="chart
 st.title("Quadratic Spline Interpolation")
 
 text = st.text_area("Input x, y data here (separated by commas)", value="3,2.5\n4.5,1\n7,2.5\n9,0.5")
-x = st.number_input("Input x value to estimate", value=5.5)
+x = st.number_input("Input x value to estimate", value=5.5000)
     
 try:
     interpolate(text, x)
