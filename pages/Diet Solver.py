@@ -29,9 +29,21 @@ default = ['Frozen Broccoli',
             'White Bread',
             'Oatmeal Cookies']
 
-foods_to_include = st.multiselect("Select foods to include in diet", foods, default=default)
+container = st.container()
+all = st.checkbox("Select all")
+test_case = st.checkbox("Use test case")
+
+if all:
+    foods_to_include = container.multiselect("Select foods to include in diet", foods, default=foods)
+elif test_case:
+    foods_to_include = container.multiselect("Select foods to include in diet", foods, default=default)
+else:
+    foods_to_include = container.multiselect("Select foods to include in diet", foods)
 
 augcoeffmatrix = solver.solve(foods_to_include)
+
+st.write()
+augcoeffmatrix
 
 with st.expander("View raw data"):
     raw_data
