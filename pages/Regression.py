@@ -5,14 +5,18 @@ import regression.regression as rr
 import matplotlib.pyplot as plt
 
 def regress(text, x, order):
+    # Check if order is non-negative
     if order < 0:
         st.write("Order must be non-negative.")
         return
 
+    # Get the regression function
     f = rr.regression(text, ',', order)
 
+    # Display in format f(x) = ... while removing lambda and x for printing in GUI
     readable_function = f.replace('lambda x: ', '').replace('**', '^').replace('*', '')
 
+    # Get x, y points
     x_points = []
     y_points = []
 
@@ -21,6 +25,7 @@ def regress(text, x, order):
         x_points.append(float(line[0]))
         y_points.append(float(line[1]))
 
+    # Check if order is valid
     if order > len(x_points):
         st.write(f"Order is too high, since you have {len(x_points)} data points. Try {len(x_points)} or lower.")
         return
@@ -40,7 +45,7 @@ def regress(text, x, order):
     ax.plot(x_line, y_line)
 
     st.pyplot(fig)
-    st.caption(f'f(x) = {readable_function}')
+    st.write(f"f(x) = {readable_function}")
     
 
 st.set_page_config(page_title="Polynomial Regression", page_icon=":bar_chart:")
