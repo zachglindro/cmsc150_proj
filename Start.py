@@ -11,3 +11,4 @@ st.write("Choose a tool from the sidebar.")
 
 # set background to cat.gif in this directory
 st.image("cat.gif")
+st.caption("by blake s, https://www.artstation.com/artwork/03RRw4")

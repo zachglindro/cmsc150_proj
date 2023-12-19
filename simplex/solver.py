@@ -56,69 +56,57 @@ def minimize(df, max_iterations = 5000):
 
     return maximize(df, max_iterations)
 
-# Read constraints.tsv
-constraints = pd.read_csv('constraints.tsv', sep='\t', index_col=0)
+# Read data from constraints.tsv and food_data.tsv
+def read_data():
+    constraints = pd.read_csv('simplex/constraints.tsv', sep='\t', index_col=0)
+    raw_data = pd.read_csv('simplex/food_data.tsv', sep='\t', index_col=0)
 
-# Read food_data.tsv
-raw_data = pd.read_csv('food_data.tsv', sep='\t', index_col=0)
+    # Remove $ from Price/Serving
+    raw_data['Price/Serving'] = raw_data['Price/Serving'].str.replace('$', '').astype(float)
 
-# Remove $ from Price/Serving
-raw_data['Price/Serving'] = raw_data['Price/Serving'].str.replace('$', '').astype(float)
+    return constraints, raw_data
 
-test_data = raw_data.loc[['Frozen Broccoli',
-                          'Carrots,Raw',
-                          'Celery, Raw',
-                          'Frozen Corn',
-                          'Lettuce,Iceberg,Raw',
-                          'Roasted Chicken',
-                          'Potatoes, Baked',
-                          'Tofu',
-                          'Peppers, Sweet, Raw',
-                          'Spaghetti W/ Sauce',
-                          'Tomato,Red,Ripe,Raw',
-                          'Apple,Raw,W/Skin',
-                          'Banana',
-                          'Grapes',
-                          'Kiwifruit,Raw,Fresh',
-                          'Oranges',
-                          'Bagels',
-                          'Wheat Bread',
-                          'White Bread',
-                          'Oatmeal Cookies'], :]
+# Get list of foods from food_data.tsv
+def get_foods():
+    raw_data = pd.read_csv('simplex/food_data.tsv', sep='\t', index_col=0)
+    return raw_data.index.tolist()
 
-# Remove Serving Size column because it's not needed for simplex
-test_data = test_data.drop(columns=['Serving Size'])
+def solve(list_of_food_names):
+    constraints, raw_data = read_data()
+    data = raw_data.loc[list_of_food_names, :]
 
-# Swap Price/Serving and last column because Price is what we're minimizing
-test_data = test_data[[c for c in test_data.columns if c != 'Price/Serving'] + ['Price/Serving']]
+    # Drop Serving Size column because it's not needed for simplex
+    data = data.drop(columns=['Serving Size'])
 
-# Add the minimum and maximum constraints for the nutrients in the last row
-negatives = test_data.copy().multiply(-1).iloc[:, :-1].add_suffix('_max')
-test_data = pd.concat([negatives, test_data], axis=1)
+    # Swap Price/Serving and last column because Price is what we're minimizing
+    data = data[[c for c in data.columns if c != 'Price/Serving'] + ['Price/Serving']]
 
-min = pd.DataFrame(constraints['Min']).transpose().reset_index(drop=True)
-max = pd.DataFrame(constraints['Max']).transpose().multiply(-1).reset_index(drop=True).add_suffix('_max')
-cons = pd.concat([max,min], axis=1)
+    # Add the minimum and maximum constraints for the nutrients in the last row
+    negatives = data.copy().multiply(-1).iloc[:, :-1].add_suffix('_max')
+    data = pd.concat([negatives, data], axis=1)
 
-test_data = pd.concat([test_data, cons], axis=0)
-test_data.iloc[-1, -1] = 0
+    min = pd.DataFrame(constraints['Min']).transpose().reset_index(drop=True)
+    max = pd.DataFrame(constraints['Max']).transpose().multiply(-1).reset_index(drop=True).add_suffix('_max')
+    cons = pd.concat([max,min], axis=1)
 
-# Each food has max 10 serving. Add this constraint
-num_rows, num_cols = test_data.shape
+    data = pd.concat([data, cons], axis=0)
+    data.iloc[-1, -1] = 0
 
-# Insert rows for max serving constraint
-for i in range(num_rows - 1):
-    before_last_column = len(test_data.columns) - 1
-    test_data.insert(before_last_column, f'max_{i}', 0)
+    # Each food has max 10 serving. Add this constraint
+    num_rows, num_cols = data.shape
 
+    # Insert rows for max serving constraint
+    for i in range(num_rows - 1):
+        before_last_column = len(data.columns) - 1
+        data.insert(before_last_column, f'max_{i}', 0)
 
-for i in range(num_rows - 1):
-    # Set -1s diagonally for max serving constraint
-    test_data.iloc[i, len(test_data.columns)-len(test_data.index)-1+i+1] = -1
+    for i in range(num_rows - 1):
+        # Set -1s diagonally for max serving constraint
+        data.iloc[i, len(data.columns)-len(data.index)-1+i+1] = -1
 
-    # Set bottom row to -10 for max serving constraint
-    test_data.iloc[len(test_data.index)-1, len(test_data.columns)-len(test_data.index)-1+i+1] = -10
+        # Set bottom row to -10 for max serving constraint
+        data.iloc[len(data.index)-1, len(data.columns)-len(data.index)-1+i+1] = -10
 
+    solved = minimize(data)
 
-solved = minimize(test_data)
-print(solved)
+    return solved
