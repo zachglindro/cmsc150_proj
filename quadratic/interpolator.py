@@ -62,32 +62,17 @@ def get_functions_and_ranges(augcoeffmatrix, data):
         if i == 0:
             raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]})'
         else:
-            raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {augcoeffmatrix.iloc[i+m.ceil(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
+            # TODO: hacky fix for 3 points
+            if len(data.index) == 3:
+                raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {augcoeffmatrix.iloc[i+m.floor(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
+            else:
+                raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {augcoeffmatrix.iloc[i+m.ceil(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
+            #raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {augcoeffmatrix.iloc[i+m.ceil(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
         
         functions.append(raw_lambda)
 
         # append ranges as array instead
         ranges.append([data.iloc[i,0], data.iloc[i+1,0]])
-
-    return functions, ranges
-
-# Imports a CSV file, sorts it by x, and returns the sorted data
-def import_data(file_name, sep):
-    data = pd.read_csv(file_name, sep=sep)
-    data = data.sort_values(by='x')
-
-    return data
-
-def interpolateWithFile(file_name, sep):
-    # Check if file exists
-    try:
-        open(file_name)
-    except FileNotFoundError:
-        return "File not found."
-
-    data = import_data(file_name, sep)
-    df = augcoeffmatrix(data)
-    functions, ranges = get_functions_and_ranges(df, data)
 
     return functions, ranges
 
@@ -109,4 +94,3 @@ def interpolateWithText(text):
     functions, ranges = get_functions_and_ranges(df, data)
 
     return functions, ranges
-

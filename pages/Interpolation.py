@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 import quadratic.interpolator as qi
 
-# TODO: does not work w/ 3 points
 def interpolate(text, x):
     functions, ranges = qi.interpolateWithText(text)
-
+    
+    # Check if x is in range for the splines
     if x < ranges[0][0] or x > ranges[-1][1]:
         st.write("x is out of range.")
         return
