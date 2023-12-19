@@ -1,7 +1,7 @@
 import pandas as pd
 import math as m
 
-# Gauss-Jordan Elimination, only to be used within this file and not run outside
+# Gauss-Jordan Elimination
 def gauss_jordan(df):
     for i in range(len(df.index)):
         # Divide row by pivot
@@ -15,7 +15,7 @@ def gauss_jordan(df):
     return df
 
 # Performs quadratic interpolation on the data and returns the final augcoeffmatrix (with solution at RHS)
-def quadratic_interpolator(data):
+def augcoeffmatrix(data):
     # Generate colnames
     colnames = [f'b{i}' for i in range(1, len(data.index))] + [f'c{i}' for i in range(2, len(data.index))] + ['rhs']
     
@@ -64,10 +64,10 @@ def get_functions_and_ranges(augcoeffmatrix, data):
         else:
             raw_lambda = f'lambda x: {data.iloc[i, 1]} + {augcoeffmatrix.iloc[i, -1]}*(x - {data.iloc[i, 0]}) + {augcoeffmatrix.iloc[i+m.ceil(len(data.index)/2), -1]}*(x - {data.iloc[i,0]})**2'
         
-        functions.append(eval(raw_lambda))
+        functions.append(raw_lambda)
 
-        raw_range_lambda = f'lambda x: {data.iloc[i,0]} <= x <= {data.iloc[i+1,0]}'
-        ranges.append(eval(raw_range_lambda))
+        # append ranges as array instead
+        ranges.append([data.iloc[i,0], data.iloc[i+1,0]])
 
     return functions, ranges
 
@@ -77,3 +77,36 @@ def import_data(file_name, sep):
     data = data.sort_values(by='x')
 
     return data
+
+def interpolateWithFile(file_name, sep):
+    # Check if file exists
+    try:
+        open(file_name)
+    except FileNotFoundError:
+        return "File not found."
+
+    data = import_data(file_name, sep)
+    df = augcoeffmatrix(data)
+    functions, ranges = get_functions_and_ranges(df, data)
+
+    return functions, ranges
+
+def interpolateWithText(text):
+    # Convert text to dataframe
+    data = pd.DataFrame([i.split(',') for i in text.split('\n')], columns=['x', 'y'])
+
+    if len(data.index) < 3:
+        return "Invalid input."
+    
+    data = data.astype(float)
+    data = data.sort_values(by='x')
+
+    df = augcoeffmatrix(data)
+
+    if df.isnull().values.any():
+        return "Invalid input." 
+
+    functions, ranges = get_functions_and_ranges(df, data)
+
+    return functions, ranges
+

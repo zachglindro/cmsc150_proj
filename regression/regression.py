@@ -38,14 +38,10 @@ def create_function(df):
     function = 'lambda x: ' + ' + '.join(function_parts)
     return function
 
-# Get data points
-file = 'data.csv'
-data = pd.read_csv(file, sep='|')
+def regression(text, sep, order):
+    data = pd.read_csv(text, sep=sep, header=None)
+    augcoeffmatrix = generate_augcoeffmatrix(data, order)
+    augcoeffmatrix = gauss_jordan(augcoeffmatrix)
 
-order = 2 # Set order of polynomial for regression
-
-augcoeffmatrix = generate_augcoeffmatrix(data, order)
-augcoeffmatrix = gauss_jordan(augcoeffmatrix)
-
-f = eval(create_function(augcoeffmatrix))
-print(f(50))
+    f = eval(create_function(augcoeffmatrix))
+    return f
