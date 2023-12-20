@@ -35,14 +35,17 @@ def maximize(df, max_iterations = 5000):
 # 1:n-1 columns are constraints
 # nth column is the original objective function
 # form: ax=b
-def minimize(df, max_iterations = 5000):
+def minimize(df, list_of_food_names, max_iterations = 5000):
     df = df.reset_index(drop=True)
 
+    # Label last row index to "Answer"
+    df.index = df.index[:-1].tolist() + ['Answer']
+
     # Add variable names
-    df.columns = [f's{i}' for i in range(1, len(df.columns))] + ['rhs']
+    df.columns = list(df.columns[:-1]) + ['Price/Serving']
 
     # Add slack variables
-    column_names = [f'x{i}' for i in range(1, len(df.index))] + ['z']
+    column_names = list_of_food_names + ['z']
     for column_name in column_names:
         df.insert(len(df.columns)-1, column_name, 0)
 
@@ -71,6 +74,7 @@ def get_foods():
     raw_data = pd.read_csv('simplex/food_data.tsv', sep='\t', index_col=0)
     return raw_data.index.tolist()
 
+# Master function. Needs correct list of food names
 def solve(list_of_food_names):
     constraints, raw_data = read_data()
     data = raw_data.loc[list_of_food_names, :]
@@ -98,7 +102,7 @@ def solve(list_of_food_names):
     # Insert rows for max serving constraint
     for i in range(num_rows - 1):
         before_last_column = len(data.columns) - 1
-        data.insert(before_last_column, f'max_{i}', 0)
+        data.insert(before_last_column, f'max_of_{list_of_food_names[i]}', 0)
 
     for i in range(num_rows - 1):
         # Set -1s diagonally for max serving constraint
@@ -107,6 +111,7 @@ def solve(list_of_food_names):
         # Set bottom row to -10 for max serving constraint
         data.iloc[len(data.index)-1, len(data.columns)-len(data.index)-1+i+1] = -10
 
-    solved = minimize(data)
+    # Do minimization
+    solved = minimize(data, list_of_food_names)
 
     return solved

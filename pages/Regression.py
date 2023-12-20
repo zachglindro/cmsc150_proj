@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 def regress(text, x, order):
     # Check if order is non-negative
     if order <= 0:
-        st.write("Order must be positive.")
+        st.error("Order must be positive.")
         return
 
     # Get the regression function
@@ -28,12 +28,12 @@ def regress(text, x, order):
 
     # Check if there are at least 2 unique points
     if len(set(x_points)) < 2:
-        st.write("Give at least 2 unique points.")
+        st.error("Give at least 2 unique points.")
         return
 
     # Check if order is valid
     if order >= len(set(x_points)):
-        st.write(f"Order is too high, since you only have {len(set(x_points))} unique data points. Try {len(set(x_points))-1} or lower.")
+        st.error(f"Order is too high, since you only have {len(set(x_points))} unique x points. Try adding more points, or set order to {len(set(x_points))-1} or lower.")
         return
     
     st.text(f"Estimated value of f({x}) = {eval(f)(x)}")
@@ -58,10 +58,10 @@ def regress(text, x, order):
 st.set_page_config(page_title="Polynomial Regression", page_icon=":bar_chart:")
 st.title("Polynomial Regression")
 
-text = st.text_area("Input x, y data here (separated by commas)", value="50,3.3\n50,2.8\n50,2.9\n70,2.3\n70,2.6\n70,2.1\n80,2.5\n80,2.9\n80,2.4\n90,3.0\n90,3.1\n90,2.8\n100,3.3\n100,3.5\n100,3.0")
-x = st.number_input("Input x value to estimate", value=60.0000)
+text = st.text_area("Input x,y data here (separated by commas)", value="50,3.3\n50,2.8\n50,2.9\n70,2.3\n70,2.6\n70,2.1\n80,2.5\n80,2.9\n80,2.4\n90,3.0\n90,3.1\n90,2.8\n100,3.3\n100,3.5\n100,3.0")
+x = st.number_input("Input x value to estimate", value=60.0000, format="%.4f", step=0.0001)
 order = st.number_input("Input order of polynomial", value=2)
-# TODO: use slider
+# TODO: use slider?
 
 try:
     regress(text, x, order)
