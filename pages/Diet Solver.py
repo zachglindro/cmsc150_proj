@@ -15,7 +15,7 @@ def get_answer_table(augcoeffmatrix, foods_to_include, raw_data, show_all_foods=
     if not show_all_foods:
         answer = answer[answer["Amount"] != 0]
 
-    answer.loc["Total", "Cost"] = answer["Cost"].sum()
+    answer.loc["Total", "Cost ($) per day"] = answer["Cost ($) per day"].sum()
     return answer
 
 def start():
