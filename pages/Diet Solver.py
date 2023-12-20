@@ -9,7 +9,7 @@ def get_answer_table(augcoeffmatrix, foods_to_include, raw_data, show_all_foods=
     for food in foods_to_include:
         answer.loc[food, "Amount"] = augcoeffmatrix.loc["Answer", food]
         answer.loc[food, "Serving Size"] = raw_data.loc[food, "Serving Size"]
-        answer.loc[food, "Cost"] = raw_data.loc[food, "Price/Serving"] * augcoeffmatrix.loc["Answer", food]
+        answer.loc[food, "Cost ($) per day"] = raw_data.loc[food, "Price/Serving"] * augcoeffmatrix.loc["Answer", food]
     
     # Remove foods with 0 amount
     if not show_all_foods:
