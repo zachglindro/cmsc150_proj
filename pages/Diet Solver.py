@@ -3,7 +3,7 @@ import pandas as pd
 import simplex.solver as solver
 
 # Gets the basic solution from the augmented coefficient matrix
-def get_answer_table(augcoeffmatrix, foods_to_include, raw_data):
+def get_answer_table(augcoeffmatrix, foods_to_include, raw_data, show_all_foods=False):
     answer = pd.DataFrame(index=foods_to_include + ["Total"], columns=["Amount", "Serving Size", "Cost ($) per day"], data=0)
     
     for food in foods_to_include:
@@ -12,7 +12,8 @@ def get_answer_table(augcoeffmatrix, foods_to_include, raw_data):
         answer.loc[food, "Cost"] = raw_data.loc[food, "Price/Serving"] * augcoeffmatrix.loc["Answer", food]
     
     # Remove foods with 0 amount
-    answer = answer[answer["Amount"] != 0]
+    if not show_all_foods:
+        answer = answer[answer["Amount"] != 0]
 
     answer.loc["Total", "Cost"] = answer["Cost"].sum()
     return answer
@@ -57,6 +58,7 @@ def start():
 
     # Get the final augcoeffmatrix
     augcoeffmatrix = None
+    history = None
     if st.button("Solve"):
         if len(foods_to_include) == 0:
             st.error("Please select at least one food!")
@@ -64,6 +66,12 @@ def start():
 
         bar = st.progress(0, text="Solving...")
         augcoeffmatrix = solver.solve(foods_to_include)
+
+        # Check if no solution found
+        if type(augcoeffmatrix) == int:
+            bar.progress(0, text="No solution found.")
+            return
+
         answer = get_answer_table(augcoeffmatrix, foods_to_include, raw_data)
         bar.progress(100, text="Solved!")
 
@@ -72,9 +80,18 @@ def start():
         st.write("Optimized menu")
         st.dataframe(answer)
 
-    # Display augcoeffmatrix
-    with st.expander("Guts!"):
-        augcoeffmatrix
+        with st.expander("Guts!"):
+            history = solver.history
+            for i in range(len(history)):
+                st.write(f"Iteration {i}")
+                st.write(history[i])
+                st.write("")
+
+                st.dataframe(get_answer_table(history[i], foods_to_include, raw_data, show_all_foods=True))
+
+            st.write("Final augmented coefficient matrix")
+            st.dataframe(get_answer_table(augcoeffmatrix, foods_to_include, raw_data, show_all_foods=True))
+            augcoeffmatrix
 
     # Display raw data and constraints
     with st.expander("View raw data"):

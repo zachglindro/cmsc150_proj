@@ -1,12 +1,17 @@
 import pandas as pd
 pd.set_option('display.max_columns', None)
 
+history = []
+
 # Takes in normal maximization matrix
 def maximize(df, max_iterations = 5000):
+    history = []
     df = df.astype(float)
     i = 0
 
     while df.iloc[-1].lt(0).any() and i < max_iterations:
+        history.append(df.copy())
+
         # Select pivot column
         pivot_column = df.iloc[-1].idxmin()
 
