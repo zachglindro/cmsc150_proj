@@ -5,7 +5,7 @@ history = []
 
 # Takes in normal maximization matrix
 def maximize(df, max_iterations = 5000):
-    history = []
+    history.clear()
     df = df.astype(float)
     i = 0
 
