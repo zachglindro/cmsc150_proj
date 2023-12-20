@@ -1,3 +1,8 @@
-# Requirements
+# CMSC 150 Tools
+Run using
+```
 pip install -r requirements.txt
-(installs streamlit, numpy, pandas, and matplotlib)
+streamlit run Start.py
+```
+
+Check the wiki for more information.
