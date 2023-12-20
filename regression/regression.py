@@ -38,6 +38,7 @@ def create_function(df):
     function = 'lambda x: ' + ' + '.join(function_parts)
     return function
 
+# Main function
 def regression(text, sep, order):
     x = []
     y = []
