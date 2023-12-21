@@ -80,7 +80,7 @@ def get_functions_and_ranges(augcoeffmatrix, data):
 def interpolateWithText(text):
     # Convert text to dataframe
     data = pd.DataFrame([i.split(',') for i in text.split('\n')], columns=['x', 'y'])
-
+    
     if len(data.index) < 3:
         return "Invalid input."
     

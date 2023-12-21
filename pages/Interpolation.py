@@ -45,6 +45,7 @@ def interpolate(text, x):
     st.caption("Graph of the splines")
 
 text = st.text_area("Input x,y data here (separated by commas)", value="3,2.5\n4.5,1\n7,2.5\n9,0.5")
+
 x = st.number_input("Input x value to estimate", value=5.5000, format="%.4f", step=0.0001)
 
 try:
