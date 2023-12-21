@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import simplex.solver as solver
 
+st.set_page_config(page_title="Diet Solver", page_icon=":cooking:")
+st.title("Diet Solver")
+
 # Gets the basic solution from the augmented coefficient matrix
 def get_answer_table(augcoeffmatrix, foods_to_include, raw_data, show_all_foods=False):
     answer = pd.DataFrame(index=foods_to_include + ["Total"], columns=["Amount", "Serving Size", "Cost ($) per day"], data=0)
@@ -75,11 +78,12 @@ def start():
         answer = get_answer_table(augcoeffmatrix, foods_to_include, raw_data)
         bar.progress(100, text="Solved!")
 
-    # Print the answer table
     if augcoeffmatrix is not None:
+        # Print the answer table
         st.write("Optimized menu")
         st.dataframe(answer)
 
+        # Show augcoeffmatrix, basic solution per iteration
         with st.expander("Guts!"):
             history = solver.history
             for i in range(len(history)):
@@ -98,7 +102,4 @@ def start():
         raw_data
         constraints
 
-st.set_page_config(page_title="Diet Solver", page_icon=":cooking:")
-st.title("Diet Solver")
 start()
-

@@ -4,6 +4,9 @@ import numpy as np
 import regression.regression as rr
 import matplotlib.pyplot as plt
 
+st.set_page_config(page_title="Polynomial Regression", page_icon=":bar_chart:")
+st.title("Polynomial Regression")
+
 def regress(text, x, order):
     # Check if order is non-negative
     if order <= 0:
@@ -19,7 +22,6 @@ def regress(text, x, order):
     # Get x, y points
     x_points = []
     y_points = []
-
 
     for line in text.splitlines():
         line = line.split(',')
@@ -51,13 +53,8 @@ def regress(text, x, order):
     ax.plot(x_line, y_line)
 
     st.pyplot(fig)
-
     st.write(f"Regression function: f(x) = {readable_function}")
     
-
-st.set_page_config(page_title="Polynomial Regression", page_icon=":bar_chart:")
-st.title("Polynomial Regression")
-
 text = st.text_area("Input x,y data here (separated by commas)", value="50,3.3\n50,2.8\n50,2.9\n70,2.3\n70,2.6\n70,2.1\n80,2.5\n80,2.9\n80,2.4\n90,3.0\n90,3.1\n90,2.8\n100,3.3\n100,3.5\n100,3.0")
 
 file = st.file_uploader("Or input CSV here", type="csv")

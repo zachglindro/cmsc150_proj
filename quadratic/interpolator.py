@@ -84,6 +84,7 @@ def interpolateWithText(text):
     if len(data.index) < 3:
         return "Invalid input."
     
+    # Clean text
     data = data.astype(float)
     data = data.sort_values(by='x')
 
@@ -93,5 +94,5 @@ def interpolateWithText(text):
         return "Invalid input." 
 
     functions, ranges = get_functions_and_ranges(df, data)
-
+    
     return functions, ranges
